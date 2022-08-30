@@ -2,6 +2,8 @@ import './App.css';
 import styled from '@emotion/styled';
 import { gapi, loadAuth2 } from 'gapi-script';
 import { useEffect, useState } from 'react';
+import { addEvent, getCalendar, getCalendarList } from './util/calendar';
+import { login, logout } from './util/auth';
 
 const Wrap = styled.div`
   display: flex;
@@ -12,19 +14,18 @@ const Wrap = styled.div`
 `;
 
 const event: gapi.client.calendar.Event = {
-  summary: '히루가 지났는데 구글 계정이 붙어있는가?',
-  location: '강남역 7번출구',
-  description:
-    '디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션',
+  summary: '오너가 그만둠',
+  location: '인덕원역',
+  description: '기존 오너가 구독 취소함, 나는 변경 권한이 있음. 결과는?',
   start: {
-    dateTime: '2022-08-30T20:23:32',
+    date: '2022-08-30',
     timeZone: 'Asia/Seoul',
   },
   end: {
-    dateTime: '2022-08-30T21:21:22',
+    date: '2022-08-30',
     timeZone: 'Asia/Seoul',
   },
-  attendees: [{ email: 'june6723@rubric.im' }],
+  attendees: [{ email: 'solgo123@rubric.im' }],
   reminders: {
     useDefault: false,
     // overrides: [
@@ -65,8 +66,6 @@ function App() {
         .currentUser.get()
         .getBasicProfile();
 
-      console.log(gapi);
-
       setGoogleAccountInfo({
         id: user.getId(),
         name: user.getName(),
@@ -78,38 +77,20 @@ function App() {
     });
   }, [gapi]);
 
-  const login = async () => {
-    await gapi.auth2.getAuthInstance().signIn();
-    location.href = '';
-  };
+  useEffect(() => {
+    if (googleAccountInfo) {
+      gapi.load('client', () => {
+        gapi.client.init({
+          apiKey: REACT_APP_API_KEY,
+          clientId: REACT_APP_CLIENT_ID,
+          discoveryDocs: [REACT_APP_DISCOVERY_DOCS ?? ''],
+          scope: REACT_APP_SCOPES,
+        });
 
-  const logout = async () => {
-    await gapi.auth2.getAuthInstance().signOut();
-    location.href = '';
-  };
-
-  const sendEvent = () => {
-    gapi.load('client', () => {
-      gapi.client.init({
-        apiKey: REACT_APP_API_KEY,
-        clientId: REACT_APP_CLIENT_ID,
-        discoveryDocs: [REACT_APP_DISCOVERY_DOCS ?? ''],
-        scope: REACT_APP_SCOPES,
+        gapi.client.load('calendar', 'v3', () => console.log('im ready'));
       });
-
-      gapi.client.load('calendar', 'v3', () => {
-        gapi.client.calendar.events
-          .insert({
-            calendarId: 'primary',
-            resource: event,
-          })
-          .execute((event: any) => {
-            console.log(event);
-            window.open(event.htmlLink);
-          });
-      });
-    });
-  };
+    }
+  }, [googleAccountInfo]);
 
   return (
     <div className="App">
@@ -117,7 +98,24 @@ function App() {
         {googleAccountInfo ? (
           <>
             <p>currentUser: {googleAccountInfo.name}</p>
-            <p onClick={() => sendEvent()}>makeEvent</p>
+            <p onClick={() => addEvent(event)}>makeEvent</p>
+
+            <b
+              onClick={() => {
+                console.log(gapi);
+                getCalendarList(gapi.client.calendar.calendarList);
+              }}
+            >
+              getCalendarList
+            </b>
+            <b
+              onClick={() => {
+                console.log(gapi);
+                getCalendar(gapi.client.calendar.calendars);
+              }}
+            >
+              getCalendars
+            </b>
             <p onClick={() => logout()}>logout</p>
           </>
         ) : (
