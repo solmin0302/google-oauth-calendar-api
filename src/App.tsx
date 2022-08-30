@@ -11,25 +11,20 @@ const Wrap = styled.div`
   align-items: center;
 `;
 
-const event = {
-  summary:
-    '로케이션에 강남역 7번출구 결과값이 있는 데이터 넣었을때 미팅 이메일 발송 시도 결과',
+const event: gapi.client.calendar.Event = {
+  summary: '히루가 지났는데 구글 계정이 붙어있는가?',
   location: '강남역 7번출구',
   description:
     '디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션디스크립션 디스크립션',
   start: {
-    dateTime: '2022-08-29T20:23:32',
+    dateTime: '2022-08-30T20:23:32',
     timeZone: 'Asia/Seoul',
   },
   end: {
-    dateTime: '2022-08-29T21:21:22',
+    dateTime: '2022-08-30T21:21:22',
     timeZone: 'Asia/Seoul',
   },
-  attendees: [
-    { email: 'june6723@rubric.im' },
-    { email: 'dogemad93@rubric.im' },
-    { email: 'roroh00903@rubric.im' },
-  ],
+  attendees: [{ email: 'june6723@rubric.im' }],
   reminders: {
     useDefault: false,
     // overrides: [
@@ -69,6 +64,8 @@ function App() {
         .getAuthInstance()
         .currentUser.get()
         .getBasicProfile();
+
+      console.log(gapi);
 
       setGoogleAccountInfo({
         id: user.getId(),
